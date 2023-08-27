@@ -1,105 +1,48 @@
-import { useState, useEffect } from 'react'
-import { Todos } from './components/todos'
-import { type todoTittle, type FilterValue, type todoId, type todoIdAndCompleted, type ListOfTodos } from './types'
-import { TODO_FILTERS } from './const'
-import { Footer } from './components/footer'
-import { Header } from './components/header'
-import { addTodo, deleteTodoById, uptadeTodoById } from './repositories'
+// import { useContext } from "react"
+// import { Login } from "./pages/Login"
+// import { TodosPage } from "./pages/TodosPage"
+// import ProtectedRoute, { ProtectedRouteProps } from "./utils/ProtectedRoute"
+// import { BrowserRouter as Router, Route, Routes } from "react-router-dom"
+// import { AuthContext, AuthProvider } from "./context/AuthContex"
 
-const App = (): JSX.Element => {
-  const [todos, setTodos] = useState<ListOfTodos>([])
-  const [filterSelected, setFilterSelected] = useState<FilterValue>(TODO_FILTERS.ALL)
 
-  useEffect(() => {
-    fetchTodos()
-  }, [])
+// const App = (): JSX.Element => {
 
-  const handleClearAllCompleted = (): void => {
-    const newTodos = todos.filter((todo) => !todo.completed)
-    setTodos(newTodos)
-    const completedTodos = todos.filter((todo) => todo.completed)
-    completedTodos.forEach((todo) => {
-      deleteTodoById({id: todo.id})
-    })
-  }
+//   const { authenticated } = useContext(AuthContext);
 
-  const handleRemove = ({ id }: todoId): void => {
-    const newTodos = todos.filter((todo) => todo.id !== id)
-    setTodos(newTodos)
-    deleteTodoById({id})
-  }
+//   const defaultProtectedRouteProps: Omit<ProtectedRouteProps, 'outlet'> = {
+//     isAuthenticated: authenticated,
+//     authenticationPath: '/',
+//   };
+  
+//   return (
+//     <div className="todoapp">
+//       <AuthProvider>
+//       <Router>
+//         <Routes>
+//           <Route path="/" element={<Login/>}/>
+//           <Route path="/todos" element={<ProtectedRoute {...defaultProtectedRouteProps} outlet={<TodosPage/>}/>}/>
+//         </Routes>
+//       </Router>
+//       </AuthProvider>
+//     </div>
+//   )
+// }
 
-  const handleCompleted = ({ id, completed }: todoIdAndCompleted): void => {
-    const newTodos = todos.map((todo) => (todo.id === id ? { ...todo, completed } : todo))
-    setTodos(newTodos)
-    uptadeTodoById({ id, completed })
-  }
+// export default App
 
-  const handleFilterChange = (filter: FilterValue): void => {
-    setFilterSelected(filter)
-  }
+import React from "react"
+import { BrowserRouter } from "react-router-dom"
+import { AuthProvider } from "./context/AuthContex"
+import Routes from "./Routes"
 
-  const handleNewTodo = ({ title }: todoTittle): void => {
-    let newTodos: ListOfTodos = []
-    if (todos.length > 0) {
-      newTodos = [...todos, {
-        title,
-        id: todos[todos.length - 1].id + 1,
-        completed: false
-      }]  
-    }else{
-      newTodos = [...todos, {
-        title,
-        id: todos.length + 1,
-        completed: false
-      }]
-    }
-    setTodos(newTodos)    
-    const newTodo = {
-      title,
-      id: todos.length + 1,
-      completed: false
-    }
-    addTodo(newTodo)
-  }
-
-  const activeCount = todos.filter(todo => !todo.completed).length
-  const completedCount = todos.length - activeCount
-
-  const filteredTodos = todos.filter(todo => {
-    if (filterSelected === TODO_FILTERS.ACTIVE) return !todo.completed
-    if (filterSelected === TODO_FILTERS.COMPLETED) return todo.completed
-    return todo
-  })
-
-  const fetchTodos = async (): Promise<void> => {
-  try {
-    const response = await fetch('http://localhost:8000/todoitems')
-    const data = await response.json()
-    setTodos(data) 
-  } catch (error) {
-    console.log("Error fetching data",error)
-  }
-}
-
+const App:React.FC = () => {
   return (
-    <div className="todoapp">
-      <Header
-        onAddTodo={handleNewTodo}
-      />
-      <Todos
-        onToggleCompleteTodo={handleCompleted}
-        onRemoveTodo={handleRemove}
-        todos={filteredTodos}
-      />
-      <Footer
-        filterSelected={filterSelected}
-        handleFilterChange={handleFilterChange}
-        activeCount={activeCount}
-        completedCount={completedCount}
-        onClearCompleted={handleClearAllCompleted}
-      />
-    </div>
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes />
+      </AuthProvider>
+    </BrowserRouter>
   )
 }
 

@@ -1,5 +1,6 @@
 import { type Todo, type ListOfTodos, type todoIdAndCompleted, type todoId } from './types'
 
+
 export const addTodo = async (todo: Todo): Promise<void> => {
   try {
     const response = await fetch('http://localhost:8000/todoitems',
@@ -59,7 +60,7 @@ export const deleteTodoById = async (todo: todoId): Promise<void> => {
       body: JSON.stringify({id: todo.id})
     })
     // const data = await response.json()
-    // console.log(data)
+    console.log(response)
   } catch (error) {
     console.log("Error fetching data",error)
   }

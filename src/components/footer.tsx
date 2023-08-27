@@ -7,6 +7,7 @@ interface Props {
   filterSelected: FilterValue
   onClearCompleted: () => void
   handleFilterChange: (filter: FilterValue) => void
+  onLogout: () => void
 }
 
 export const Footer: React.FC<Props> = ({
@@ -14,7 +15,8 @@ export const Footer: React.FC<Props> = ({
   activeCount,
   onClearCompleted,
   filterSelected,
-  handleFilterChange
+  handleFilterChange,
+  onLogout
 }) => {
   return (
         <footer className="footer">
@@ -33,6 +35,12 @@ export const Footer: React.FC<Props> = ({
                 Clear completed
               </button>
             )}
+            <button
+              className="clear-completed"
+              onClick={onLogout}
+            >
+              log out
+            </button>
         </footer>
   )
 }
