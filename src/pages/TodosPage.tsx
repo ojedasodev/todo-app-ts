@@ -1,108 +1,115 @@
-import { useState, useEffect, useContext } from "react";
-import { Todos } from "../components/todos";
+import { useState, useEffect, useContext } from 'react'
+import { Todos } from '../components/todos'
 import {
   type todoTittle,
   type FilterValue,
   type todoId,
   type todoIdAndCompleted,
-  type ListOfTodos,
-} from "../types";
-import { TODO_FILTERS } from "../const";
-import { Footer } from "../components/footer";
-import { Header } from "../components/header";
-import { addTodo, deleteTodoById, uptadeTodoById } from "../repositories";
-import { AuthContext } from "../context/AuthContex";
+  type ListOfTodos
+} from '../types'
+import { TODO_FILTERS } from '../const'
+import { Footer } from '../components/footer'
+import { Header } from '../components/header'
+import { addTodo, deleteTodoById, uptadeTodoById } from '../repositories'
+import { AuthContext } from '../context/AuthContex'
 
 export const TodosPage = (): JSX.Element => {
-  const { LogoutUser } = useContext(AuthContext);
-  const [todos, setTodos] = useState<ListOfTodos>([]);
+  const { LogoutUser } = useContext(AuthContext)
+  const [todos, setTodos] = useState<ListOfTodos>([])
   const [filterSelected, setFilterSelected] = useState<FilterValue>(
     TODO_FILTERS.ALL
-  );
+  )
 
   useEffect(() => {
-    fetchTodos();
-  }, []);
+    void fetchTodos()
+  }, [])
 
   const handleClearAllCompleted = (): void => {
-    const newTodos = todos.filter((todo) => !todo.completed);
-    setTodos(newTodos);
-    const completedTodos = todos.filter((todo) => todo.completed);
+    const newTodos = todos.filter((todo) => !todo.completed)
+    setTodos(newTodos)
+    const completedTodos = todos.filter((todo) => todo.completed)
     completedTodos.forEach((todo) => {
-      deleteTodoById({ id: todo.id });
-    });
-  };
+      void deleteTodoById({ id: todo.id })
+    })
+  }
 
   const handleRemove = ({ id }: todoId): void => {
-    const newTodos = todos.filter((todo) => todo.id !== id);
-    setTodos(newTodos);
-    deleteTodoById({ id });
-  };
+    const newTodos = todos.filter((todo) => todo.id !== id)
+    setTodos(newTodos)
+    void deleteTodoById({ id })
+  }
 
   const handleCompleted = ({ id, completed }: todoIdAndCompleted): void => {
     const newTodos = todos.map((todo) =>
       todo.id === id ? { ...todo, completed } : todo
-    );
-    setTodos(newTodos);
-    uptadeTodoById({ id, completed });
-  };
+    )
+    setTodos(newTodos)
+    void uptadeTodoById({ id, completed })
+  }
 
   const handleFilterChange = (filter: FilterValue): void => {
-    setFilterSelected(filter);
-  };
+    setFilterSelected(filter)
+  }
 
   const handleNewTodo = ({ title }: todoTittle): void => {
-    let newTodos: ListOfTodos = [];
+    let newTodos: ListOfTodos = []
     if (todos.length > 0) {
       newTodos = [
         ...todos,
         {
           title,
           id: todos[todos.length - 1].id + 1,
-          completed: false,
-        },
-      ];
+          completed: false
+        }
+      ]
     } else {
       newTodos = [
         ...todos,
         {
           title,
           id: todos.length + 1,
-          completed: false,
-        },
-      ];
+          user: 
+          completed: false
+        }
+      ]
     }
-    setTodos(newTodos);
+    setTodos(newTodos)
     const newTodo = {
       title,
       id: todos.length + 1,
-      completed: false,
-    };
-    addTodo(newTodo);
-  };
+      completed: false
+    }
+    void addTodo(newTodo)
+  }
 
   const handleLogout = (): void => {
-    LogoutUser();
-  };
+    LogoutUser()
+  }
 
-  const activeCount = todos.filter((todo) => !todo.completed).length;
-  const completedCount = todos.length - activeCount;
+  const activeCount = todos.filter((todo) => !todo.completed).length
+  const completedCount = todos.length - activeCount
 
   const filteredTodos = todos.filter((todo) => {
-    if (filterSelected === TODO_FILTERS.ACTIVE) return !todo.completed;
-    if (filterSelected === TODO_FILTERS.COMPLETED) return todo.completed;
-    return todo;
-  });
+    if (filterSelected === TODO_FILTERS.ACTIVE) return !todo.completed
+    if (filterSelected === TODO_FILTERS.COMPLETED) return todo.completed
+    return todo
+  })
 
   const fetchTodos = async (): Promise<void> => {
     try {
-      const response = await fetch("http://localhost:8000/todoitems");
-      const data = await response.json();
-      setTodos(data);
+      const response = await fetch('http://localhost:8000/todoitems', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('tokens')}`
+        }
+      })
+      const data = await response.json()
+      setTodos(data)
     } catch (error) {
-      console.log("Error fetching data", error);
+      console.log('Error fetching data', error)
     }
-  };
+  }
 
   return (
     <div className="todoapp">
@@ -121,5 +128,5 @@ export const TodosPage = (): JSX.Element => {
         onLogout={handleLogout}
       />
     </div>
-  );
-};
+  )
+}
